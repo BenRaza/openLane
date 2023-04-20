@@ -1,5 +1,6 @@
 #include <cmath>
 #include "camera/camera.hpp"
+#include "controls/controls.hpp"
 #include "glimac/default_shader.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -43,8 +44,9 @@ int main()
     form.indices.push_back(3);
     form.init();
 
-    Camera camera{};
-    camera.init(glm::vec3(0.f, 0.f, 0.f), cameraDistance, cameraBaseHeight);
+    Camera    camera{};
+    glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f);
+    camera.init(pos, cameraDistance, cameraBaseHeight);
 
     ctx.update = [&]() {
         // glimac::bind_default_shader();
@@ -57,23 +59,9 @@ int main()
         shader.set("view", view);
         form.draw();
 
-        if (ctx.key_is_pressed(GLFW_KEY_LEFT))
-        {
-            camera.rotateLeft();
-        }
-        if (ctx.key_is_pressed(GLFW_KEY_RIGHT))
-        {
-            camera.rotateRight();
-        }
-        if (ctx.key_is_pressed(GLFW_KEY_UP))
-        {
-            camera.rotateUp();
-        }
-        if (ctx.key_is_pressed(GLFW_KEY_DOWN))
-        {
-            camera.rotateDown();
-        }
-        std::cout << "distance : " << std::sqrt(std::pow(camera.getPosition().x, 2) + std::pow(camera.getPosition().y, 2) + std::pow(camera.getPosition().z, 2)) << std::endl;
+        checkInputs(ctx, camera);
+
+        // std::cout << "distance : " << std::sqrt(std::pow(camera.getPosition().x, 2) + std::pow(camera.getPosition().y, 2) + std::pow(camera.getPosition().z, 2)) << std::endl;
 
         // shader.set("model2", model);
         // form2.draw();

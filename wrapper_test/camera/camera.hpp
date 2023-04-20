@@ -5,7 +5,7 @@
 class Camera {
 private:
     glm::vec3 m_position{};
-    glm::vec3 m_target{};
+    glm::vec3 m_target;
     float     m_distance{};
     float     m_height{};
     float     m_heightAngle{};
