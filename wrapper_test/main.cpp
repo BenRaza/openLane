@@ -1,4 +1,4 @@
-// #include "GLFW/glfw3.h"
+#include <cmath>
 #include "camera/camera.hpp"
 #include "glimac/default_shader.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
@@ -45,7 +45,6 @@ int main()
 
     Camera camera{};
     camera.init(glm::vec3(0.f, 0.f, 0.f), cameraDistance, cameraBaseHeight);
-    std::cout << camera.getPosition().x << " " << camera.getPosition().y << " " << camera.getPosition().z << std::endl;
 
     ctx.update = [&]() {
         // glimac::bind_default_shader();
@@ -58,10 +57,23 @@ int main()
         shader.set("view", view);
         form.draw();
 
-        // if (ctx.key_is_pressed(GLFW_KEY_LEFT_CONTROL))
-        // {
-        //     std::cout << "bibop" << std::endl;
-        // }
+        if (ctx.key_is_pressed(GLFW_KEY_LEFT))
+        {
+            camera.rotateLeft();
+        }
+        if (ctx.key_is_pressed(GLFW_KEY_RIGHT))
+        {
+            camera.rotateRight();
+        }
+        if (ctx.key_is_pressed(GLFW_KEY_UP))
+        {
+            camera.rotateUp();
+        }
+        if (ctx.key_is_pressed(GLFW_KEY_DOWN))
+        {
+            camera.rotateDown();
+        }
+        std::cout << "distance : " << std::sqrt(std::pow(camera.getPosition().x, 2) + std::pow(camera.getPosition().y, 2) + std::pow(camera.getPosition().z, 2)) << std::endl;
 
         // shader.set("model2", model);
         // form2.draw();
