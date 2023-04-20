@@ -30,7 +30,6 @@ void Wrapper::init()
 
 void Wrapper::draw()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
     glBindVertexArray(vao);
     if (indices.empty())
     {
@@ -38,7 +37,7 @@ void Wrapper::draw()
     }
     else
     {
-        glDrawElements(GL_TRIANGLES, indices.size() + 1, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     }
     glBindVertexArray(0);
 }
