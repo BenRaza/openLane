@@ -3,9 +3,9 @@
 #include "p6/p6.h"
 
 struct Vertex3D {
-    glm::vec3 m_position{};
-    glm::vec3 m_color{};
+    glm::vec3 _position{};
+    glm::vec3 _color{};
 
     Vertex3D(glm::vec3 position, glm::vec3 color)
-        : m_position(position), m_color(color){};
+        : _position(position), _color(color){};
 };
