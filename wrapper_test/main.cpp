@@ -5,19 +5,22 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/fwd.hpp"
+#include "player/player.hpp"
 // #include "src-common/glimac/sphere_vertices.hpp"
+#include "vertex3D/vertex3D.hpp"
 #include "wrapper/wrapper.hpp"
 
 int main()
 {
     glm::mat4 projection = glm::perspective(glm::radians(45.f), static_cast<float>(1280) / static_cast<float>(720), 0.001f, 100.0f);
-    glm::mat4 model      = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
     float cameraDistance   = 2;
     float cameraBaseHeight = 1;
 
     auto ctx = p6::Context{{1280, 720, "TP3 EX1"}};
     ctx.maximize_window();
+
+    glEnable(GL_DEPTH_TEST);
 
     const p6::Shader shader = p6::load_shader(
         "shaders/color2D.vs.glsl",
@@ -28,10 +31,10 @@ int main()
 
     Wrapper form{};
     // for (vertice : vertices)
-    struct Vertex3D ver1 = {glm::vec3(-0.5f, -0.5f, 0), glm::vec3(0.f, 1.f, 1.f)};
-    Vertex3D        ver2 = Vertex3D(glm::vec3(0.5f, -0.5f, 0), glm::vec3(1.f, 0.f, 1.f));
-    Vertex3D        ver3 = Vertex3D(glm::vec3(0.5f, 0.5f, 0), glm::vec3(1.f, 1.f, 0.f));
-    Vertex3D        ver4 = Vertex3D(glm::vec3(-0.5f, 0.5f, 0), glm::vec3(1.f, 1.f, 1.f));
+    Vertex3D ver1 = {glm::vec3(-0.5f, -0.5f, 0), glm::vec3(0.f, 1.f, 1.f)};
+    Vertex3D ver2 = Vertex3D(glm::vec3(0.5f, -0.5f, 0), glm::vec3(1.f, 0.f, 1.f));
+    Vertex3D ver3 = Vertex3D(glm::vec3(0.5f, 0.5f, 0), glm::vec3(1.f, 1.f, 0.f));
+    Vertex3D ver4 = Vertex3D(glm::vec3(-0.5f, 0.5f, 0), glm::vec3(1.f, 1.f, 1.f));
     form.vertices.push_back(ver1);
     form.vertices.push_back(ver2);
     form.vertices.push_back(ver3);
@@ -44,27 +47,86 @@ int main()
     form.indices.push_back(3);
     form.init();
 
+    Player drone{};
+
+    Wrapper cube{};
+    cube.vertices.emplace_back(glm::vec3(-0.25f, -0.25f, -0.25f), glm::vec3(0.f, 0.f, 0.f));
+    cube.vertices.emplace_back(glm::vec3(0.25f, -0.25f, -0.25f), glm::vec3(1.f, 0.f, 0.f));
+    cube.vertices.emplace_back(glm::vec3(0.25f, -0.25f, 0.25f), glm::vec3(1.f, 1.f, 0.f));
+    cube.vertices.emplace_back(glm::vec3(-0.25f, -0.25f, 0.25f), glm::vec3(0.f, 1.f, 0.f));
+    cube.vertices.emplace_back(glm::vec3(-0.25f, 0.25f, -0.25f), glm::vec3(0.f, 0.f, 1.f));
+    cube.vertices.emplace_back(glm::vec3(0.25f, 0.25f, -0.25f), glm::vec3(1.f, 0.f, 1.f));
+    cube.vertices.emplace_back(glm::vec3(0.25f, 0.25f, 0.25f), glm::vec3(1.f, 1.f, 1.f));
+    cube.vertices.emplace_back(glm::vec3(-0.25f, 0.25f, 0.25f), glm::vec3(0.f, 1.f, 1.f));
+
+    // Face
+    cube.indices.push_back(0);
+    cube.indices.push_back(1);
+    cube.indices.push_back(2);
+    cube.indices.push_back(0);
+    cube.indices.push_back(2);
+    cube.indices.push_back(3);
+
+    // LEFT
+    cube.indices.push_back(0);
+    cube.indices.push_back(3);
+    cube.indices.push_back(4);
+    cube.indices.push_back(3);
+    cube.indices.push_back(4);
+    cube.indices.push_back(7);
+
+    // DOWN
+    cube.indices.push_back(0);
+    cube.indices.push_back(4);
+    cube.indices.push_back(5);
+    cube.indices.push_back(0);
+    cube.indices.push_back(1);
+    cube.indices.push_back(5);
+
+    // Back
+    cube.indices.push_back(5);
+    cube.indices.push_back(6);
+    cube.indices.push_back(7);
+    cube.indices.push_back(4);
+    cube.indices.push_back(5);
+    cube.indices.push_back(7);
+
+    // RIGHT
+    cube.indices.push_back(1);
+    cube.indices.push_back(2);
+    cube.indices.push_back(5);
+    cube.indices.push_back(2);
+    cube.indices.push_back(5);
+    cube.indices.push_back(6);
+
+    // UP
+    cube.indices.push_back(2);
+    cube.indices.push_back(3);
+    cube.indices.push_back(6);
+    cube.indices.push_back(3);
+    cube.indices.push_back(6);
+    cube.indices.push_back(7);
+
+    cube.init();
+
     Camera    camera{};
     glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f);
-    camera.init(pos, cameraDistance, cameraBaseHeight);
+    camera.init(&drone, cameraDistance, cameraBaseHeight);
 
     ctx.update = [&]() {
-        // glimac::bind_default_shader();
-        glClear(GL_COLOR_BUFFER_BIT);
-        glm::mat4 view = glm::lookAt(camera.getPosition(), camera.getTarget(), {0, 1, 0});
-        // model          = glm::translate(model, glm::vec3(0.f, 0.f, -0.005f));
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glm::mat4 baseModel = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        glm::mat4 view      = glm::lookAt(camera.getPosition(), drone.getPosition(), {0, 1, 0});
         shader.use();
         shader.set("projection", projection);
-        shader.set("model", model);
+        shader.set("model", baseModel);
         shader.set("view", view);
         form.draw();
+        drone.update(shader);
+        camera.update();
+        cube.draw();
 
-        checkInputs(ctx, camera);
-
-        // std::cout << "distance : " << std::sqrt(std::pow(camera.getPosition().x, 2) + std::pow(camera.getPosition().y, 2) + std::pow(camera.getPosition().z, 2)) << std::endl;
-
-        // shader.set("model2", model);
-        // form2.draw();
+        checkInputs(ctx, camera, drone);
     };
 
     ctx.start();
