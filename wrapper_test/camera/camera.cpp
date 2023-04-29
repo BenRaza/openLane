@@ -18,7 +18,10 @@ void Camera::init(Player* player, float distance, float height)
     {
         _position = {player->getPosition().x - (_planarDistance * player->getDirection().x), player->getPosition().y + _height, player->getPosition().z + (_planarDistance * player->getDirection().z)};
     }
-    //_position = {player->getPosition().x - (_planarDistance * std::sin(_planarAngle)), player->getPosition().y + _height, player->getPosition().z - (_planarDistance * std::cos(_planarAngle))};
+    else
+    {
+        _position = {player->getPosition().x - (_planarDistance * std::cos(_planarAngle)), player->getPosition().y + _height, player->getPosition().z + (_planarDistance * std::sin(_planarAngle))};
+    }
     _target = player;
 }
 
@@ -27,11 +30,27 @@ void Camera::setAngle(float angle)
     _planarAngle = std::fmod(angle, (2 * p6::PI));
 }
 
+void Camera::moveAway()
+{
+    if (_distance + 0.05f < _maxDistance)
+    {
+        _distance += 0.05f;
+    }
+}
+
+void Camera::moveCloser()
+{
+    if (_distance - 0.05f > _minDistance)
+    {
+        _distance -= 0.05f;
+    }
+}
+
 void Camera::rotate(float angle)
 {
     _isLocked = false;
     setAngle(_planarAngle + angle);
-    _position = {_target->getPosition().x - (_planarDistance * std::sin(_planarAngle)), _target->getPosition().y + _height, _target->getPosition().z - (_planarDistance * std::cos(_planarAngle))};
+    //_position = {_target->getPosition().x - (_planarDistance * std::cos(_planarAngle)), _target->getPosition().y + _height, _target->getPosition().z - (_planarDistance * std::sin(_planarAngle))};
 }
 
 void Camera::rotateLeft()
@@ -61,4 +80,9 @@ void Camera::rotateDown()
 float Camera::findHeight() const
 {
     return std::sin(_heightAngle) * _distance;
+}
+
+void Camera::lockCamera()
+{
+    _isLocked = true;
 }

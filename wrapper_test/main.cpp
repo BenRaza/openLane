@@ -7,6 +7,7 @@
 #include "glm/fwd.hpp"
 #include "player/player.hpp"
 // #include "src-common/glimac/sphere_vertices.hpp"
+#include "./loaderGLTF/Model.h"
 #include "vertex3D/vertex3D.hpp"
 #include "wrapper/wrapper.hpp"
 
@@ -25,6 +26,11 @@ int main()
     const p6::Shader shader = p6::load_shader(
         "shaders/color2D.vs.glsl",
         "shaders/color2D.fs.glsl"
+    );
+
+    const p6::Shader shaderGLTF = p6::load_shader(
+        "shaders/gltf.vs.glsl",
+        "shaders/gltf.fs.glsl"
     );
 
     // const std::vector<glimac::ShapeVertex> vertices = glimac::sphere_vertices(1.f, 32, 16);
@@ -113,6 +119,8 @@ int main()
     glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f);
     camera.init(&drone, cameraDistance, cameraBaseHeight);
 
+    Model flyingDrone("./assets/drone.gltf");
+
     ctx.update = [&]() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glm::mat4 baseModel = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -122,9 +130,22 @@ int main()
         shader.set("model", baseModel);
         shader.set("view", view);
         form.draw();
-        drone.update(shader);
+        // cube.draw();
+        shaderGLTF.use();
+        shaderGLTF.set("projection", projection);
+        shaderGLTF.set("view", view);
+        // glm::mat4 modelC = glm::mat4(1.0);
+        //  modelC           = glm::translate(modelC, glm::vec3(-0.2, 0.2, 0.6));
+        //  modelC = glm::rotate(modelC, p6::PI, glm::vec3(1.0f, 0.0f, 0.0f));
+        //  modelC           = glm::rotate(modelC, -p6::PI / 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
+        //  modelC = glm::scale(modelC, glm::vec3(0.03));
+        drone.update(shaderGLTF);
         camera.update();
-        cube.draw();
+        // shaderGLTF.set("model", modelC);
+        shaderGLTF.set("lightColor", glm::vec3(1, 1, 1));
+        shaderGLTF.set("lightPosition", glm::vec3(2, 2, 2));
+        shaderGLTF.set("camPos", camera.getPosition());
+        flyingDrone.Draw(shaderGLTF.id());
 
         checkInputs(ctx, camera, drone);
     };

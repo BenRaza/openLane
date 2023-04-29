@@ -21,6 +21,21 @@ void checkInputs(p6::Context& ctx, Camera& camera, Player& player)
     {
         camera.rotateDown();
     }
+    if (ctx.key_is_pressed(GLFW_KEY_TAB))
+    {
+        camera.lockCamera();
+    }
+    ctx.mouse_scrolled = [&camera](p6::MouseScroll event) {
+        std::cout << event.dy << std::endl;
+        if (event.dy == 1)
+        {
+            camera.moveCloser();
+        }
+        if (event.dy == -1)
+        {
+            camera.moveAway();
+        }
+    };
 
     ///// THIS IS THE PLAYER ///////
 
