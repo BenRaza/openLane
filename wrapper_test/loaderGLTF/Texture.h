@@ -1,5 +1,4 @@
 #pragma once
-
 #include "p6/p6.h"
 
 // #include <stb/stb_image.h>
@@ -8,7 +7,7 @@
 
 class Texture {
 public:
-    GLuint      ID;
+    GLuint ID;
     const char* type;
 
     Texture(const char* image, const char* texType);
@@ -22,5 +21,3 @@ public:
     // Deletes a texture
     void Delete();
 };
-
-GLuint loadTexture(std::filesystem::path texture_path);
