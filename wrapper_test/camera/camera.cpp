@@ -1,6 +1,17 @@
 #include "camera.hpp"
 #include <cmath>
 
+float getAngle(Camera camera, Player player)
+{
+    float x = (camera.getPosition().x - player.getPosition().x) / camera.getPlanarDistance();
+    float z = (camera.getPosition().z - player.getPosition().z) / camera.getPlanarDistance();
+    if (x < 0)
+    {
+        return std::asin(z);
+    }
+    return std::acos(z) + (p6::PI / 2);
+}
+
 void Camera::init(Player* player, float distance, float height)
 {
     _distance = distance;
@@ -16,7 +27,8 @@ void Camera::init(Player* player, float distance, float height)
     _planarDistance = height / std::tan(_heightAngle);
     if (_isLocked)
     {
-        _position = {player->getPosition().x - (_planarDistance * player->getDirection().x), player->getPosition().y + _height, player->getPosition().z + (_planarDistance * player->getDirection().z)};
+        _position    = {player->getPosition().x - (_planarDistance * player->getDirection().x), player->getPosition().y + _height, player->getPosition().z + (_planarDistance * player->getDirection().z)};
+        _planarAngle = getAngle(*this, *player);
     }
     else
     {

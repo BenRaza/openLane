@@ -22,6 +22,7 @@ private:
 
 public:
     glm::vec3 getPosition() { return _position; }
+    float     getPlanarDistance() const { return _planarDistance; }
     void      init(Player* player, float distance, float height);
     void      moveAway();
     void      moveCloser();

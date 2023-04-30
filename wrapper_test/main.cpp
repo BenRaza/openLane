@@ -120,6 +120,7 @@ int main()
     camera.init(&drone, cameraDistance, cameraBaseHeight);
 
     Model flyingDrone("./assets/drone.gltf");
+    glActiveTexture(GL_TEXTURE1);
 
     ctx.update = [&]() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
