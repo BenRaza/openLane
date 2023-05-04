@@ -115,8 +115,8 @@ int main()
 
     // cube.init();
 
-    Camera    camera{};
-    glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f);
+    Camera camera{};
+    // glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f);
     camera.init(&drone, cameraDistance, cameraBaseHeight);
 
     Model flyingDrone("./assets/drone.gltf");
@@ -135,7 +135,7 @@ int main()
         shaderGLTF.set("projection", projection);
         shaderGLTF.set("view", view);
         shaderGLTF.set("lightColor", glm::vec3(1, 0.92, 0.85));
-        shaderGLTF.set("lightPosition", glm::vec3(-100, -100, 0));
+        shaderGLTF.set("lightPosition", glm::vec3(0, 100, 0));
         shaderGLTF.set("camPos", camera.getPosition());
         drone.update(shaderGLTF);
         camera.update();

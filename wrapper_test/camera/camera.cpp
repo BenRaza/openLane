@@ -10,6 +10,8 @@ float getAngle(Camera camera, Player player)
         return std::asin(z);
     }
     return std::acos(z) + (p6::PI / 2);
+
+    return std::asin(z);
 }
 
 void Camera::init(Player* player, float distance, float height)

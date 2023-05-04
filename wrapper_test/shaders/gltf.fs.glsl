@@ -27,7 +27,7 @@ uniform vec3 camPos;
 vec4 direcLight()
 {
 
-	vec3 lightVec = lightPosition - vec3(0); // lightDirection sun
+	vec3 lightVec = -lightPosition + vec3(0); // lightDirection sun
 
 	// ambient lighting
 	float ambient = 0.25f;
@@ -44,8 +44,8 @@ vec4 direcLight()
 	float diffuse = max(dot(normal, lightDirection), 0.0f);
 
 	// specular lighting
-	float specularLight = 0.50f;
-	vec3 viewDirection = normalize(camPos - crntPos);
+	float specularLight = 0.25f;
+	vec3 viewDirection = normalize(abs(camPos + crntPos));
 	vec3 reflectionDirection = reflect(-lightDirection, normal);
 	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
 	float specular = specAmount * specularLight;
