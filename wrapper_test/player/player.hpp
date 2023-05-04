@@ -1,4 +1,5 @@
 #pragma once
+#include "../loaderGLTF/Model.h"
 #include "p6/p6.h"
 
 class Player {
@@ -12,6 +13,12 @@ private:
     const float _verticalAcceleration = 0.001;
     const float _verticalMaxSpeed     = 0.1;
 
+    Model flyingDrone  = Model("./assets/drone.gltf");
+    Model circleLeft   = Model("./assets/circle.gltf");
+    Model helicesLeft  = Model("./assets/helices.gltf");
+    Model circleRight  = Model("./assets/circle.gltf");
+    Model helicesRight = Model("./assets/helices.gltf");
+
     glm::vec3 _position{};
     glm::vec3 _spawnedDirection{};
     glm::vec3 _direction{};
@@ -19,6 +26,7 @@ private:
     float     _verticalSpeed  = 0;
     float     _rotateSpeed    = 0;
     float     _planarRotation = 0;
+    float     _helicesRotate  = 0;
 
 public:
     explicit Player(glm::vec3 position = glm::vec3{0}, glm::vec3 direction = glm::vec3(1.f, 0.f, 0.f))

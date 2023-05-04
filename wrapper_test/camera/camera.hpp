@@ -13,7 +13,7 @@ private:
     float       _planarAngle = 0;
     float       _planarDistance{};
     const float _rotateSpeed = 0.02;
-    const float _minDistance = 1.f;
+    const float _minDistance = 0.5f;
     const float _maxDistance = 5;
     void        rotate(float angle);
     void        setAngle(float angle);

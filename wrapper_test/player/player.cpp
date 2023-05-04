@@ -88,9 +88,24 @@ void Player::update(const p6::Shader& shader)
     base = glm::rotate(base, -20.f * _speed, glm::vec3(0.0f, 0.f, 1.0f));
     base = glm::rotate(base, -3.f * _rotateSpeed, glm::vec3(1.0f, 0.f, 0.f));
     base = glm::rotate(base, p6::PI, glm::vec3(1.0f, 0.0f, 0.0f));
-    base = glm::rotate(base, p6::PI, glm::vec3(0.0f, 1.0f, 0.0f));
+    base = glm::rotate(base, -p6::PI / 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
     base = glm::scale(base, glm::vec3(0.03));
-    // base = glm::rotate(base, p6::PI / 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
 
     shader.set("model", base);
+    flyingDrone.Draw(shader.id());
+
+    base = glm::translate(base, glm::vec3(5.73, -0.9, 0.27));
+    base = glm::rotate(base, -20.f * _speed, glm::vec3(1.0f, 0.f, 0.0f));
+
+    shader.set("model", base);
+    circleLeft.Draw(shader.id());
+    helicesLeft.Draw(shader.id());
+
+    base = glm::translate(base, glm::vec3(-11.46, 0.0, 0.0));
+
+    shader.set("model", base);
+    circleRight.Draw(shader.id());
+    helicesRight.Draw(shader.id());
+
+    // shader.set("model", base);
 }

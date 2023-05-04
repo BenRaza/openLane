@@ -77,14 +77,12 @@ void Camera::rotateRight()
 
 void Camera::rotateUp()
 {
-    _isLocked = false;
     _heightAngle += _rotateSpeed;
     _height = findHeight();
 }
 
 void Camera::rotateDown()
 {
-    _isLocked = false;
     _heightAngle -= _rotateSpeed;
     _height = findHeight();
 }

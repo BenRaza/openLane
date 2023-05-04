@@ -38,13 +38,13 @@ void main()
 
 	// Assigns the normal from the Vertex Data to "Normal"
 	//Normal = mat3(transpose(inverse(model))) * aNormal; // hum
-	Normal = aNormal;
+	Normal = mat3(transpose(inverse(model))) * aNormal;
 	// Assigns the colors from the Vertex Data to "color"
 	color = aColor;
 	// Assigns the texture coordinates from the Vertex Data to "texCoord"
 	texCoord = mat2(0.0, -1.0, 1.0, 0.0) * aTex;
 
 	gl_Position = projection * view * model * vec4(crntPos, 1.0);
-	crntPos = gl_Position.xyz;
+	crntPos = (model * vec4(crntPos, 1.0)).xyz;
 	
 }

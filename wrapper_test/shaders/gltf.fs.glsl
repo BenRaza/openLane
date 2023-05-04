@@ -50,7 +50,6 @@ vec4 direcLight()
 	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
 	float specular = specAmount * specularLight;
 
-
 	return (texture(diffuse0, texCoord) * (diffuse + ambient) + 1.0 * specular) * vec4(lightColor,1.0);
 	// return (texture(diffuse0, texCoord) * (diffuse + ambient) + texture(specular0, texCoord).r * specular * inten) * lightColor;
 }

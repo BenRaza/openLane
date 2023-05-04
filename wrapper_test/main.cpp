@@ -55,72 +55,72 @@ int main()
 
     Player drone{};
 
-    Wrapper cube{};
-    cube.vertices.emplace_back(glm::vec3(-0.25f, -0.25f, -0.25f), glm::vec3(0.f, 0.f, 0.f));
-    cube.vertices.emplace_back(glm::vec3(0.25f, -0.25f, -0.25f), glm::vec3(1.f, 0.f, 0.f));
-    cube.vertices.emplace_back(glm::vec3(0.25f, -0.25f, 0.25f), glm::vec3(1.f, 1.f, 0.f));
-    cube.vertices.emplace_back(glm::vec3(-0.25f, -0.25f, 0.25f), glm::vec3(0.f, 1.f, 0.f));
-    cube.vertices.emplace_back(glm::vec3(-0.25f, 0.25f, -0.25f), glm::vec3(0.f, 0.f, 1.f));
-    cube.vertices.emplace_back(glm::vec3(0.25f, 0.25f, -0.25f), glm::vec3(1.f, 0.f, 1.f));
-    cube.vertices.emplace_back(glm::vec3(0.25f, 0.25f, 0.25f), glm::vec3(1.f, 1.f, 1.f));
-    cube.vertices.emplace_back(glm::vec3(-0.25f, 0.25f, 0.25f), glm::vec3(0.f, 1.f, 1.f));
+    // Wrapper cube{};
+    // cube.vertices.emplace_back(glm::vec3(-0.25f, -0.25f, -0.25f), glm::vec3(0.f, 0.f, 0.f));
+    // cube.vertices.emplace_back(glm::vec3(0.25f, -0.25f, -0.25f), glm::vec3(1.f, 0.f, 0.f));
+    // cube.vertices.emplace_back(glm::vec3(0.25f, -0.25f, 0.25f), glm::vec3(1.f, 1.f, 0.f));
+    // cube.vertices.emplace_back(glm::vec3(-0.25f, -0.25f, 0.25f), glm::vec3(0.f, 1.f, 0.f));
+    // cube.vertices.emplace_back(glm::vec3(-0.25f, 0.25f, -0.25f), glm::vec3(0.f, 0.f, 1.f));
+    // cube.vertices.emplace_back(glm::vec3(0.25f, 0.25f, -0.25f), glm::vec3(1.f, 0.f, 1.f));
+    // cube.vertices.emplace_back(glm::vec3(0.25f, 0.25f, 0.25f), glm::vec3(1.f, 1.f, 1.f));
+    // cube.vertices.emplace_back(glm::vec3(-0.25f, 0.25f, 0.25f), glm::vec3(0.f, 1.f, 1.f));
 
-    // Face
-    cube.indices.push_back(0);
-    cube.indices.push_back(1);
-    cube.indices.push_back(2);
-    cube.indices.push_back(0);
-    cube.indices.push_back(2);
-    cube.indices.push_back(3);
+    // // Face
+    // cube.indices.push_back(0);
+    // cube.indices.push_back(1);
+    // cube.indices.push_back(2);
+    // cube.indices.push_back(0);
+    // cube.indices.push_back(2);
+    // cube.indices.push_back(3);
 
-    // LEFT
-    cube.indices.push_back(0);
-    cube.indices.push_back(3);
-    cube.indices.push_back(4);
-    cube.indices.push_back(3);
-    cube.indices.push_back(4);
-    cube.indices.push_back(7);
+    // // LEFT
+    // cube.indices.push_back(0);
+    // cube.indices.push_back(3);
+    // cube.indices.push_back(4);
+    // cube.indices.push_back(3);
+    // cube.indices.push_back(4);
+    // cube.indices.push_back(7);
 
-    // DOWN
-    cube.indices.push_back(0);
-    cube.indices.push_back(4);
-    cube.indices.push_back(5);
-    cube.indices.push_back(0);
-    cube.indices.push_back(1);
-    cube.indices.push_back(5);
+    // // DOWN
+    // cube.indices.push_back(0);
+    // cube.indices.push_back(4);
+    // cube.indices.push_back(5);
+    // cube.indices.push_back(0);
+    // cube.indices.push_back(1);
+    // cube.indices.push_back(5);
 
-    // Back
-    cube.indices.push_back(5);
-    cube.indices.push_back(6);
-    cube.indices.push_back(7);
-    cube.indices.push_back(4);
-    cube.indices.push_back(5);
-    cube.indices.push_back(7);
+    // // Back
+    // cube.indices.push_back(5);
+    // cube.indices.push_back(6);
+    // cube.indices.push_back(7);
+    // cube.indices.push_back(4);
+    // cube.indices.push_back(5);
+    // cube.indices.push_back(7);
 
-    // RIGHT
-    cube.indices.push_back(1);
-    cube.indices.push_back(2);
-    cube.indices.push_back(5);
-    cube.indices.push_back(2);
-    cube.indices.push_back(5);
-    cube.indices.push_back(6);
+    // // RIGHT
+    // cube.indices.push_back(1);
+    // cube.indices.push_back(2);
+    // cube.indices.push_back(5);
+    // cube.indices.push_back(2);
+    // cube.indices.push_back(5);
+    // cube.indices.push_back(6);
 
-    // UP
-    cube.indices.push_back(2);
-    cube.indices.push_back(3);
-    cube.indices.push_back(6);
-    cube.indices.push_back(3);
-    cube.indices.push_back(6);
-    cube.indices.push_back(7);
+    // // UP
+    // cube.indices.push_back(2);
+    // cube.indices.push_back(3);
+    // cube.indices.push_back(6);
+    // cube.indices.push_back(3);
+    // cube.indices.push_back(6);
+    // cube.indices.push_back(7);
 
-    cube.init();
+    // cube.init();
 
     Camera    camera{};
     glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f);
     camera.init(&drone, cameraDistance, cameraBaseHeight);
 
     Model flyingDrone("./assets/drone.gltf");
-    glActiveTexture(GL_TEXTURE1);
+    Model helices("./assets/helices.gltf");
 
     ctx.update = [&]() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -131,22 +131,14 @@ int main()
         shader.set("model", baseModel);
         shader.set("view", view);
         form.draw();
-        // cube.draw();
         shaderGLTF.use();
         shaderGLTF.set("projection", projection);
         shaderGLTF.set("view", view);
-        // glm::mat4 modelC = glm::mat4(1.0);
-        //  modelC           = glm::translate(modelC, glm::vec3(-0.2, 0.2, 0.6));
-        //  modelC = glm::rotate(modelC, p6::PI, glm::vec3(1.0f, 0.0f, 0.0f));
-        //  modelC           = glm::rotate(modelC, -p6::PI / 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
-        //  modelC = glm::scale(modelC, glm::vec3(0.03));
+        shaderGLTF.set("lightColor", glm::vec3(1, 0.92, 0.85));
+        shaderGLTF.set("lightPosition", glm::vec3(-100, -100, 0));
+        shaderGLTF.set("camPos", camera.getPosition());
         drone.update(shaderGLTF);
         camera.update();
-        // shaderGLTF.set("model", modelC);
-        shaderGLTF.set("lightColor", glm::vec3(1, 1, 1));
-        shaderGLTF.set("lightPosition", glm::vec3(2, 2, 2));
-        shaderGLTF.set("camPos", camera.getPosition());
-        flyingDrone.Draw(shaderGLTF.id());
 
         checkInputs(ctx, camera, drone);
     };

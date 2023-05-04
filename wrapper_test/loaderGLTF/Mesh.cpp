@@ -1,8 +1,9 @@
 #include "Mesh.h"
 
-Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Texture>& textures) {
+Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Texture>& textures)
+{
     Mesh::vertices = vertices;
-    Mesh::indices = indices;
+    Mesh::indices  = indices;
     Mesh::textures = textures;
 
     myVao.Bind();
@@ -27,39 +28,45 @@ void Mesh::Draw(
     glm::mat4 matrix,
     glm::vec3 translation,
     glm::quat rotation,
-    glm::vec3 scale) {
+    glm::vec3 scale
+)
+{
     // Bind shader to be able to access uniforms
     // shader.Activate();
     myVao.Bind();
 
     // Keep track of how many of each type of textures we have
-    unsigned int numDiffuse = 0;
+    unsigned int numDiffuse  = 0;
     unsigned int numSpecular = 0;
 
-    for (unsigned int i = 0; i < textures.size(); i++) {
+    for (unsigned int i = 0; i < textures.size(); i++)
+    {
         std::string num;
         std::string type = textures[i].type;
-        if (type == "diffuse") {
+        if (type == "diffuse")
+        {
             num = std::to_string(numDiffuse++);
-        } else if (type == "specular") {
+        }
+        else if (type == "specular")
+        {
             num = std::to_string(numSpecular++);
         }
         textures[i].texUnit(shaderId, (type + num).c_str(), i);
         textures[i].Bind();
     }
-    //Take care of the camera Matrix
+    // Take care of the camera Matrix
     glUniform3f(glGetUniformLocation(shaderId, "camPos"), 0, 0, 0);
     // camera.Matrix(shader, "camMatrix");
 
     // Initialize matrices
     glm::mat4 trans = glm::mat4(1.0f);
-    glm::mat4 rot = glm::mat4(1.0f);
-    glm::mat4 sca = glm::mat4(1.0f);
+    glm::mat4 rot   = glm::mat4(1.0f);
+    glm::mat4 sca   = glm::mat4(1.0f);
 
     // Transform the matrices to their correct form
     trans = glm::translate(trans, translation);
-    rot = glm::mat4_cast(rotation);
-    sca = glm::scale(sca, scale);
+    rot   = glm::mat4_cast(rotation);
+    sca   = glm::scale(sca, scale);
 
     // Push the matrices to the vertex shader
     glUniformMatrix4fv(glGetUniformLocation(shaderId, "translation"), 1, GL_FALSE, glm::value_ptr(trans));
