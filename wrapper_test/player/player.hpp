@@ -13,7 +13,7 @@ private:
     const float _verticalAcceleration = 0.001;
     const float _verticalMaxSpeed     = 0.1;
 
-    const float _rotateRingsAcceleration = 0.03;
+    const float _rotateRingsAcceleration = 0.05;
     const float _maxRotateRings          = 0.5;
 
     Model flyingDrone  = Model("./assets/drone.gltf");

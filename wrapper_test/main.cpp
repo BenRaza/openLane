@@ -1,4 +1,5 @@
 #include <cmath>
+#include <vector>
 #include "camera/camera.hpp"
 #include "controls/controls.hpp"
 #include "glimac/default_shader.hpp"
@@ -8,6 +9,7 @@
 #include "player/player.hpp"
 // #include "src-common/glimac/sphere_vertices.hpp"
 #include "./loaderGLTF/Model.h"
+#include "boids/boids.hpp"
 #include "vertex3D/vertex3D.hpp"
 #include "wrapper/wrapper.hpp"
 
@@ -17,6 +19,13 @@ int main()
 
     float cameraDistance   = 2;
     float cameraBaseHeight = 1;
+
+    float        RATIO_SEPARATION = 5;
+    float        RATIO_ALIGNEMENT = 10;
+    float        RATIO_COHESION   = 1;
+    float        RAY_OF_FORCE     = 0.25;
+    unsigned int NUMBER_OF_BOIDS  = 20;
+    float        speed            = 0.015;
 
     auto ctx = p6::Context{{1280, 720, "TP3 EX1"}};
     ctx.maximize_window();
@@ -53,74 +62,25 @@ int main()
     form.indices.push_back(3);
     form.init();
 
-    Player drone{};
+    Player             drone{};
+    std::vector<Boids> ufos{};
 
-    // Wrapper cube{};
-    // cube.vertices.emplace_back(glm::vec3(-0.25f, -0.25f, -0.25f), glm::vec3(0.f, 0.f, 0.f));
-    // cube.vertices.emplace_back(glm::vec3(0.25f, -0.25f, -0.25f), glm::vec3(1.f, 0.f, 0.f));
-    // cube.vertices.emplace_back(glm::vec3(0.25f, -0.25f, 0.25f), glm::vec3(1.f, 1.f, 0.f));
-    // cube.vertices.emplace_back(glm::vec3(-0.25f, -0.25f, 0.25f), glm::vec3(0.f, 1.f, 0.f));
-    // cube.vertices.emplace_back(glm::vec3(-0.25f, 0.25f, -0.25f), glm::vec3(0.f, 0.f, 1.f));
-    // cube.vertices.emplace_back(glm::vec3(0.25f, 0.25f, -0.25f), glm::vec3(1.f, 0.f, 1.f));
-    // cube.vertices.emplace_back(glm::vec3(0.25f, 0.25f, 0.25f), glm::vec3(1.f, 1.f, 1.f));
-    // cube.vertices.emplace_back(glm::vec3(-0.25f, 0.25f, 0.25f), glm::vec3(0.f, 1.f, 1.f));
-
-    // // Face
-    // cube.indices.push_back(0);
-    // cube.indices.push_back(1);
-    // cube.indices.push_back(2);
-    // cube.indices.push_back(0);
-    // cube.indices.push_back(2);
-    // cube.indices.push_back(3);
-
-    // // LEFT
-    // cube.indices.push_back(0);
-    // cube.indices.push_back(3);
-    // cube.indices.push_back(4);
-    // cube.indices.push_back(3);
-    // cube.indices.push_back(4);
-    // cube.indices.push_back(7);
-
-    // // DOWN
-    // cube.indices.push_back(0);
-    // cube.indices.push_back(4);
-    // cube.indices.push_back(5);
-    // cube.indices.push_back(0);
-    // cube.indices.push_back(1);
-    // cube.indices.push_back(5);
-
-    // // Back
-    // cube.indices.push_back(5);
-    // cube.indices.push_back(6);
-    // cube.indices.push_back(7);
-    // cube.indices.push_back(4);
-    // cube.indices.push_back(5);
-    // cube.indices.push_back(7);
-
-    // // RIGHT
-    // cube.indices.push_back(1);
-    // cube.indices.push_back(2);
-    // cube.indices.push_back(5);
-    // cube.indices.push_back(2);
-    // cube.indices.push_back(5);
-    // cube.indices.push_back(6);
-
-    // // UP
-    // cube.indices.push_back(2);
-    // cube.indices.push_back(3);
-    // cube.indices.push_back(6);
-    // cube.indices.push_back(3);
-    // cube.indices.push_back(6);
-    // cube.indices.push_back(7);
-
-    // cube.init();
+    for (unsigned int i = 0; i < NUMBER_OF_BOIDS; i++)
+    {
+        Boids boid(speed);
+        boid.init();
+        ufos.push_back(boid);
+    }
 
     Camera camera{};
     // glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f);
     camera.init(&drone, cameraDistance, cameraBaseHeight);
 
-    Model flyingDrone("./assets/drone.gltf");
-    Model helices("./assets/helices.gltf");
+    shaderGLTF.use();
+    shaderGLTF.set("lightColor", glm::vec3(0, 1.0, 1.0));
+    shaderGLTF.set("lightColor2", glm::vec3(1.0, 0.0, 0.0));
+    shaderGLTF.set("lightPosition", glm::vec3(50.0, 75, 0.0));
+    shaderGLTF.set("lightPosition2", glm::vec3(0.0, 75, 50.0));
 
     ctx.update = [&]() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -134,9 +94,11 @@ int main()
         shaderGLTF.use();
         shaderGLTF.set("projection", projection);
         shaderGLTF.set("view", view);
-        shaderGLTF.set("lightColor", glm::vec3(1, 0.92, 0.85));
-        shaderGLTF.set("lightPosition", glm::vec3(0, 100, 0));
         shaderGLTF.set("camPos", camera.getPosition());
+        for (Boids& ufo : ufos)
+        {
+            ufo.update(ufos, RAY_OF_FORCE, RATIO_SEPARATION, RATIO_ALIGNEMENT, RATIO_COHESION, shaderGLTF);
+        }
         drone.update(shaderGLTF);
         camera.update();
 

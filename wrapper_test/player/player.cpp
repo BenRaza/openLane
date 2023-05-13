@@ -112,6 +112,7 @@ void Player::update(const p6::Shader& shader)
     base = glm::translate(base, glm::vec3(_position.x, _position.y, _position.z));
     base = glm::rotate(base, _planarRotation, glm::vec3(0.0f, 1.0f, 0.0f));
     base = glm::rotate(base, -20.f * _speed, glm::vec3(0.0f, 0.f, 1.0f));
+    base = glm::rotate(base, 10.f * _verticalSpeed, glm::vec3(0.0f, 0.f, 1.0f));
     base = glm::rotate(base, -3.f * _rotateSpeed, glm::vec3(1.0f, 0.f, 0.f));
     base = glm::rotate(base, p6::PI, glm::vec3(1.0f, 0.0f, 0.0f));
     base = glm::rotate(base, -p6::PI / 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -122,7 +123,7 @@ void Player::update(const p6::Shader& shader)
 
     base = glm::translate(base, glm::vec3(5.73, -0.9, 0.27));
     base = glm::rotate(base, -20.f * _speed, glm::vec3(1.0f, 0.f, 0.0f));
-    base = glm::rotate(base, _rightRingRotate, glm::vec3(1.0f, 0.f, 0.0f));
+    base = glm::rotate(base, 2 * _rightRingRotate, glm::vec3(1.0f, 0.f, 0.0f));
 
     shader.set("model", base);
     circleLeft.Draw(shader.id());
@@ -133,9 +134,9 @@ void Player::update(const p6::Shader& shader)
     helicesLeft.Draw(shader.id());
 
     base = glm::rotate(base, -_helicesRotate, glm::vec3(0.f, 1.f, 0.f));
-    base = glm::rotate(base, -_rightRingRotate, glm::vec3(1.0f, 0.f, 0.0f));
+    base = glm::rotate(base, -2 * _rightRingRotate, glm::vec3(1.0f, 0.f, 0.0f));
     base = glm::translate(base, glm::vec3(-11.46, 0.0, 0.0));
-    base = glm::rotate(base, _leftRingRotate, glm::vec3(1.0f, 0.f, 0.0f));
+    base = glm::rotate(base, 2 * _leftRingRotate, glm::vec3(1.0f, 0.f, 0.0f));
 
     shader.set("model", base);
     circleRight.Draw(shader.id());
