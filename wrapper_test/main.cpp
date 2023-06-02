@@ -20,15 +20,17 @@ int main()
     float cameraDistance   = 2;
     float cameraBaseHeight = 1;
 
-    float        RATIO_SEPARATION = 5;
-    float        RATIO_ALIGNEMENT = 10;
-    float        RATIO_COHESION   = 1;
-    float        RAY_OF_FORCE     = 0.25;
-    unsigned int NUMBER_OF_BOIDS  = 20;
+    float        RATIO_SEPARATION = 0.04;
+    float        RATIO_ALIGNEMENT = 0.05;
+    float        RATIO_COHESION   = 0.03;
+    float        RAY_OF_FORCE     = 2;
+    unsigned int NUMBER_OF_BOIDS  = 30;
     float        speed            = 0.015;
 
     auto ctx = p6::Context{{1280, 720, "TP3 EX1"}};
     ctx.maximize_window();
+
+    Model skybox = Model("./assets/skyBox.gltf");
 
     glEnable(GL_DEPTH_TEST);
 
@@ -42,25 +44,10 @@ int main()
         "shaders/gltf.fs.glsl"
     );
 
-    // const std::vector<glimac::ShapeVertex> vertices = glimac::sphere_vertices(1.f, 32, 16);
-
-    Wrapper form{};
-    // for (vertice : vertices)
-    Vertex3D ver1 = {glm::vec3(-0.5f, -0.5f, 0), glm::vec3(0.f, 1.f, 1.f)};
-    Vertex3D ver2 = Vertex3D(glm::vec3(0.5f, -0.5f, 0), glm::vec3(1.f, 0.f, 1.f));
-    Vertex3D ver3 = Vertex3D(glm::vec3(0.5f, 0.5f, 0), glm::vec3(1.f, 1.f, 0.f));
-    Vertex3D ver4 = Vertex3D(glm::vec3(-0.5f, 0.5f, 0), glm::vec3(1.f, 1.f, 1.f));
-    form.vertices.push_back(ver1);
-    form.vertices.push_back(ver2);
-    form.vertices.push_back(ver3);
-    form.vertices.push_back(ver4);
-    form.indices.push_back(0);
-    form.indices.push_back(1);
-    form.indices.push_back(2);
-    form.indices.push_back(0);
-    form.indices.push_back(2);
-    form.indices.push_back(3);
-    form.init();
+    const p6::Shader shaderBox = p6::load_shader(
+        "shaders/gltf2.vs.glsl",
+        "shaders/gltf2.fs.glsl"
+    );
 
     Player             drone{};
     std::vector<Boids> ufos{};
@@ -77,24 +64,42 @@ int main()
     camera.init(&drone, cameraDistance, cameraBaseHeight);
 
     shaderGLTF.use();
-    shaderGLTF.set("lightColor", glm::vec3(0, 1.0, 1.0));
-    shaderGLTF.set("lightColor2", glm::vec3(1.0, 0.0, 0.0));
-    shaderGLTF.set("lightPosition", glm::vec3(50.0, 75, 0.0));
-    shaderGLTF.set("lightPosition2", glm::vec3(0.0, 75, 50.0));
+    shaderGLTF.set("lightColor", glm::vec3(0.99, 0.94, 0.72));
+    shaderGLTF.set("lightColor2", glm::vec3(0.8, 0.33, 0.0));
+    shaderGLTF.set("lightPosition", glm::vec3(150.0, 75, 0.0));
+    shaderGLTF.set("lightPosition2", glm::vec3(0.0, 75, 150.0));
+    shaderGLTF.set("spotLightColor", glm::vec3(1.0, 0.0, 1.0));
+    shaderGLTF.set("spotLightCutOff", glm::cos(glm::radians(12.5f)));
+
+    shaderBox.use();
+    glm::mat4 base = glm::mat4(1.0);
+    base           = glm::scale(base, glm::vec3(50));
+    shaderBox.set("model", base);
+
+    ctx.imgui = [&]() {
+        ImGui::Begin("Test3");
+        ImGui::SliderFloat("Ratio Separation", &RATIO_SEPARATION, 0.001f, 1.f);
+        ImGui::SliderFloat("Ratio Alignement", &RATIO_ALIGNEMENT, 0.001f, 1.f);
+        ImGui::SliderFloat("Ratio Cohesion", &RATIO_COHESION, 0.001f, 1.f);
+        ImGui::SliderFloat("Distance of force", &RAY_OF_FORCE, 0.1f, 10.f);
+        ImGui::End();
+    };
 
     ctx.update = [&]() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glm::mat4 baseModel = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        glm::mat4 view      = glm::lookAt(camera.getPosition(), drone.getPosition(), {0, 1, 0});
-        shader.use();
-        shader.set("projection", projection);
-        shader.set("model", baseModel);
-        shader.set("view", view);
-        form.draw();
+        glm::mat4 view = glm::lookAt(camera.getPosition(), drone.getPosition(), {0, 1, 0});
         shaderGLTF.use();
         shaderGLTF.set("projection", projection);
         shaderGLTF.set("view", view);
         shaderGLTF.set("camPos", camera.getPosition());
+        glm::vec3 dir;
+        dir.x = -drone.getDirection().x;
+        dir.y = drone.getDirection().y + 0.2f;
+        dir.z = drone.getDirection().z;
+        shaderGLTF.set("spotLightPosition", drone.getPosition() - 0.06f * dir);
+        shaderGLTF.set("spotLightDirection", dir);
+        std::cout << "X : " << drone.getDirection().x << std::endl;
+        std::cout << "Z : " << drone.getDirection().z << std::endl;
         for (Boids& ufo : ufos)
         {
             ufo.update(ufos, RAY_OF_FORCE, RATIO_SEPARATION, RATIO_ALIGNEMENT, RATIO_COHESION, shaderGLTF);
@@ -102,9 +107,14 @@ int main()
         drone.update(shaderGLTF);
         camera.update();
 
+        shaderBox.use();
+        shaderBox.set("projection", projection);
+        shaderBox.set("view", view);
+        skybox.Draw(shaderBox.id());
+
         checkInputs(ctx, camera, drone);
     };
 
     ctx.start();
-    form.finish();
+    // form.finish();
 }

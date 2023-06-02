@@ -30,86 +30,43 @@ Boids::Boids(float speed)
     std::uniform_real_distribution<double> randX(-sizeOfCube + 0.5, sizeOfCube - 0.5);
     std::uniform_real_distribution<double> randY(-sizeOfCube + 0.5, sizeOfCube - 0.5);
 
-    _position = glm::vec3((randX(mt), 5, randY(mt)));
-    _speed    = speed;
-}
+    _position.x = randX(mt);
+    _position.y = randX(mt);
+    _position.z = randY(mt);
 
-void makeBorder(float& position)
-{
-    if (position >= sizeOfCube)
-    {
-        position = sizeOfCube - 0.01;
-    }
-    else if (position <= sizeOfCube)
-    {
-        position = -sizeOfCube + 0.01;
-    }
+    _speed = speed;
 }
 
 void invertPosition(float& position, float& direction)
 {
-    if (position + direction > sizeOfCube || position + direction < -sizeOfCube)
+    if (position + direction > sizeOfCube)
     {
-        direction *= -1;
+        position -= 1.8f * sizeOfCube;
     }
-}
-
-void Boids::setPosition(glm::vec3 newPos)
-{
-    // _position = newPos;
-    // if (_position.x > sizeOfCube)
-    // {
-    //     _position.x = sizeOfCube - 0.01;
-    // }
-    // else if (_position.x < -sizeOfCube)
-    // {
-    //     _position.x = -sizeOfCube + 0.01;
-    // }
-    // if (_position.y > sizeOfCube)
-    // {
-    //     _position.y = sizeOfCube - 0.01;
-    // }
-    // else if (_position.y < -sizeOfCube)
-    // {
-    //     _position.y = -sizeOfCube + 0.01;
-    // }
-    // if (_position.z > sizeOfCube)
-    // {
-    //     _position.z = sizeOfCube - 0.01;
-    // }
-    // else if (_position.z < sizeOfCube)
-    // {
-    //     _position.z = -sizeOfCube + 0.01;
-    // }
-    makeBorder(_position.x);
-    makeBorder(_position.y);
-    makeBorder(_position.z);
+    else if (position + direction < -sizeOfCube)
+    {
+        position += 1.8f * sizeOfCube;
+    }
 }
 
 void Boids::setDirection(glm::vec3 newDir)
 {
-    _angle     = glm::atan<float>(newDir.x, newDir.y);
-    _direction = _speed * glm::normalize(newDir);
+    _angle = glm::atan<float>(newDir.x, newDir.z);
+    _direction += glm::vec3(newDir.x, 0, newDir.z);
+    if (_direction != glm::vec3(0.f, 0.f, 0.f))
+    {
+        _direction = glm::normalize(_direction);
+    }
 }
 
 void Boids::useForce(glm::vec3 extForce)
 {
-    const glm::vec3 newForce = extForce * .0004f;
-    setDirection(getDirection() + newForce);
-    // if (getPosition().x + getDirection().x > screen || getPosition().x + getDirection().x < -screen)
-    // {
-    //     m_direction.x *= -1;
-    // }
-    // if (getPosition().y + getDirection().y > 1.f || getPosition().y + getDirection().y < -1.f)
-    // {
-    //     m_direction.y *= -1;
-    // }
+    const glm::vec3 newForce = extForce;
+    setDirection(newForce);
     invertPosition(_position.x, _direction.x);
     invertPosition(_position.y, _direction.y);
     invertPosition(_position.z, _direction.z);
-    // setPosition(_position + _direction);
-    // std::cout << _position.x << std::endl;
-    _position += _direction;
+    _position += _speed * _direction;
 }
 
 void Boids::init()
@@ -121,15 +78,15 @@ void Boids::init()
     setAngle(angle);
 }
 
-void Boids::update(const std::vector<Boids>& boids, float range, float separation, float alignment, float cohesion, const p6::Shader& shader)
+void Boids::update(std::vector<Boids>& boids, float range, float separation, float alignment, float cohesion, const p6::Shader& shader)
 {
     glm::vec3 separationForce = calculateSeparationForce(boids, range);
     glm::vec3 aligmentForce   = calculateAlignmentForce(boids, range);
     glm::vec3 cohesionForce   = calculateCohesionForce(boids, range);
     glm::vec3 steeringForce   = separationForce * separation + aligmentForce * alignment + cohesionForce * cohesion;
-    // boid.setDirection(boid.getDirection() + acc);
     useForce(steeringForce);
     _planarAngle = getPlanarAngle(_direction);
+    rotateBase();
 
     glm::mat4 base = glm::mat4(1.0);
 
@@ -138,34 +95,45 @@ void Boids::update(const std::vector<Boids>& boids, float range, float separatio
     base = glm::rotate(base, -p6::PI / 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
     base = glm::rotate(base, _planarAngle, glm::vec3(0.0f, 1.0f, 0.0f));
     base = glm::scale(base, glm::vec3(0.03));
+    base = glm::rotate(base, 0.4f, glm::vec3(1.0f, 0.0f, 0.0f));
+
+    shader.set("model", base);
+    top.Draw(shader.id());
+    bot.Draw(shader.id());
+
+    base = glm::rotate(base, _rotationBase, glm::vec3(0.0f, 1.0f, 0.0f));
 
     shader.set("model", base);
     ufo.Draw(shader.id());
 }
 
-glm::vec3 Boids::calculateSeparationForce(std::vector<Boids> boids, float ray)
+glm::vec3 Boids::calculateSeparationForce(std::vector<Boids>& boids, float ray)
 {
     glm::vec3 totalForce(0.f, 0.f, 0.f);
     for (Boids& boid : boids)
     {
-        float test = glm::distance(getPosition(), getPosition());
-        if (test < ray && test > .001f)
+        float test = glm::distance(getPosition(), boid.getPosition());
+        if (test < ray && test > .00001f)
         {
             totalForce.x += ((getPosition().x - boid.getPosition().x) / glm::distance(getPosition(), boid.getPosition()));
             totalForce.y += ((getPosition().y - boid.getPosition().y) / glm::distance(getPosition(), boid.getPosition()));
             totalForce.z += ((getPosition().z - boid.getPosition().z) / glm::distance(getPosition(), boid.getPosition()));
         }
     }
-    return totalForce;
+    if (totalForce == glm::vec3(0.f, 0.f, 0.f))
+    {
+        return totalForce;
+    }
+    return glm::normalize(totalForce);
 }
 
-glm::vec3 Boids::calculateAlignmentForce(std::vector<Boids> boids, float ray)
+glm::vec3 Boids::calculateAlignmentForce(std::vector<Boids>& boids, float ray)
 {
     glm::vec3 averageDirection(0.f, 0.f, 0.f);
     for (Boids& boid : boids)
     {
         float test = glm::distance(getPosition(), boid.getPosition());
-        if (test < ray && test > .001f)
+        if (test < ray && test > .00001f)
         {
             averageDirection += boid.getDirection();
         }
@@ -178,17 +146,21 @@ glm::vec3 Boids::calculateAlignmentForce(std::vector<Boids> boids, float ray)
     return glm::normalize(averageDirection);
 }
 
-glm::vec3 Boids::calculateCohesionForce(std::vector<Boids> boids, float ray)
+glm::vec3 Boids::calculateCohesionForce(std::vector<Boids>& boids, float ray)
 {
     glm::vec3 averagePosition(0.f, 0.f, 0.f);
     for (Boids& boid : boids)
     {
         float test = glm::distance(getPosition(), boid.getPosition());
-        if (test < ray && test > .001f)
+        if (test < ray && test > .00001f)
         {
             averagePosition += boid._position;
         }
     }
     averagePosition /= boids.size();
-    return averagePosition;
+    if (averagePosition == glm::vec3(0.f, 0.f, 0.f))
+    {
+        return averagePosition;
+    }
+    return glm::normalize(averagePosition);
 }

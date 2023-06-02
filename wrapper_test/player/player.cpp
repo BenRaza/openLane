@@ -146,5 +146,7 @@ void Player::update(const p6::Shader& shader)
     shader.set("model", base);
     helicesRight.Draw(shader.id());
 
+    base = glm::mat4(1.0);
+    shader.set("model", base);
     // shader.set("model", base);
 }

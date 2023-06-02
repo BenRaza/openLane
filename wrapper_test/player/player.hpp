@@ -7,8 +7,8 @@ private:
     const float _acceleration = 0.001;
     const float _maxSpeed     = 0.1;
 
-    const float _rotateAcceleration = 0.00390625;
-    const float _rotateMaxSpeed     = 0.0625;
+    const float _rotateAcceleration = 0.002;
+    const float _rotateMaxSpeed     = 0.0425;
 
     const float _verticalAcceleration = 0.001;
     const float _verticalMaxSpeed     = 0.1;

@@ -17,8 +17,11 @@ private:
     float     _planarAngle{};
     float     _speed{};
     float     _angle{};
+    float     _rotationBase{};
 
-    Model ufo = Model("./assets/drone.gltf");
+    Model ufo = Model("./assets/soucoupe.gltf");
+    Model top = Model("./assets/soucoupeTop.gltf");
+    Model bot = Model("./assets/soucoupeBot.gltf");
 
 public:
     Boids(float speed);
@@ -53,13 +56,13 @@ public:
     {
         _speed = newSpeed;
     }
-    // glm::vec2 getAcceleration()
-    // {
-    //     return acceleration;
-    // }
+    void rotateBase()
+    {
+        _rotationBase = std::fmod((_rotationBase + 0.04), 2 * p6::PI);
+    }
     void      init();
-    void      update(const std::vector<Boids>& boids, float range, float separation, float alignment, float cohesion, const p6::Shader& shader);
-    glm::vec3 calculateSeparationForce(std::vector<Boids> boids, float ray);
-    glm::vec3 calculateAlignmentForce(std::vector<Boids> boids, float ray);
-    glm::vec3 calculateCohesionForce(std::vector<Boids> boids, float ray);
+    void      update(std::vector<Boids>& boids, float range, float separation, float alignment, float cohesion, const p6::Shader& shader);
+    glm::vec3 calculateSeparationForce(std::vector<Boids>& boids, float ray);
+    glm::vec3 calculateAlignmentForce(std::vector<Boids>& boids, float ray);
+    glm::vec3 calculateCohesionForce(std::vector<Boids>& boids, float ray);
 };

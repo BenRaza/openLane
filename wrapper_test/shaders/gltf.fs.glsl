@@ -23,11 +23,20 @@ uniform vec3 lightColor2;
 // Gets the position of the light from the main function
 uniform vec3 lightPosition;
 uniform vec3 lightPosition2;
+// Gets the position of the spotLight from the main function
+uniform vec3 spotLightPosition;
+//Gets the direction of the spotlight from the main function
+uniform vec3 spotLightDirection;
+//Gets the cutOff of the spotLight from the main function
+uniform float spotLightCutOff;
+// Gets the color of the spotLight from the main function
+uniform vec3 spotLightColor;
 // Gets the position of the camera from the main function
 uniform vec3 camPos;
 
 // ambient lighting
 float ambient = 0.25f;
+float spotAmbient = 0.5f;
 
 vec4 getColor(float diffuse, float specular, vec3 color)
 {
@@ -39,12 +48,7 @@ vec4 direcLight()
 
 	vec3 lightVec = -lightPosition; // lightDirection sun
 	vec3 lightVec2 = -lightPosition2;
-
-	// intensity of light with respect to distance
-	// float dist = length(lightVec);
-	// float a = 3.0;
-	// float b = 0.7;
-	// float inten = 1.0f / (a * dist * dist + b * dist + 1.0f);
+	vec3 lightDirectionSpot = normalize(spotLightPosition - crntPos);
 
 	// diffuse lighting
 	vec3 normal = normalize(Normal);
@@ -58,12 +62,19 @@ vec4 direcLight()
 	vec3 viewDirection = normalize(abs(camPos + crntPos));
 	vec3 reflectionDirection = reflect(-lightDirection, normal);
 	vec3 reflectionDirection2 = reflect(-lightDirection2, normal);
+	vec3 reflectionDirectionSpot = reflect(-spotLightDirection, normal);
 	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
 	float specAmount2 = pow(max(dot(viewDirection, reflectionDirection2), 0.0f), 16);
+	float specAmountSpot = pow(max(dot(viewDirection, reflectionDirectionSpot), 0.0f), 16);
 	float specular = specAmount * specularLight;
 	float specular2 = specAmount2 * specularLight;
+	float speculatSpot = specAmountSpot * specularLight;
 
-	// return ((texture(diffuse0, texCoord) * (diffuse + ambient) + 0.3 * specular) * vec4(lightColor,1.0)) + ((texture(diffuse0, texCoord) * (diffuse2 + ambient) + 0.3 *specular2) * vec4(lightColor2, 1.0));
+	float theta = dot((-lightDirectionSpot), normalize(-spotLightDirection));
+	if(theta > spotLightCutOff)
+	{
+	return getColor(diffuse, specular, lightColor) + getColor(diffuse2, specular2, lightColor2) + vec4(spotLightColor, 1.0);
+	}
 	return getColor(diffuse, specular, lightColor) + getColor(diffuse2, specular2, lightColor2);
 }
 
