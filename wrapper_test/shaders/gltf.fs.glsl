@@ -29,6 +29,7 @@ uniform vec3 spotLightPosition;
 uniform vec3 spotLightDirection;
 //Gets the cutOff of the spotLight from the main function
 uniform float spotLightCutOff;
+uniform float spotLightOuterCutOff;
 // Gets the color of the spotLight from the main function
 uniform vec3 spotLightColor;
 // Gets the position of the camera from the main function
@@ -45,7 +46,6 @@ vec4 getColor(float diffuse, float specular, vec3 color)
 
 vec4 direcLight()
 {
-
 	vec3 lightVec = -lightPosition; // lightDirection sun
 	vec3 lightVec2 = -lightPosition2;
 	vec3 lightDirectionSpot = normalize(spotLightPosition - crntPos);
@@ -68,12 +68,14 @@ vec4 direcLight()
 	float specAmountSpot = pow(max(dot(viewDirection, reflectionDirectionSpot), 0.0f), 16);
 	float specular = specAmount * specularLight;
 	float specular2 = specAmount2 * specularLight;
-	float speculatSpot = specAmountSpot * specularLight;
 
-	float theta = dot((-lightDirectionSpot), normalize(-spotLightDirection));
+	float theta = dot((lightDirectionSpot), normalize(spotLightDirection));
+	float epsilon   = spotLightCutOff - spotLightOuterCutOff; 
+	float intensity = smoothstep(spotLightCutOff, spotLightCutOff + epsilon, theta);
+
 	if(theta > spotLightCutOff)
 	{
-	return getColor(diffuse, specular, lightColor) + getColor(diffuse2, specular2, lightColor2) + vec4(spotLightColor, 1.0);
+	return getColor(diffuse, specular, lightColor) + getColor(diffuse2, specular2, lightColor2) + 0.7 * intensity * vec4(spotLightColor, 1.0);
 	}
 	return getColor(diffuse, specular, lightColor) + getColor(diffuse2, specular2, lightColor2);
 }
